@@ -1,22 +1,52 @@
 <!DOCTYPE html>
+<html lang="en">
 <html>
-<head>
-    <title>To-Do List</title>
-</head>
-<body>
-    <h1>My To-Do List</h1>
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" name="title" placeholder="New task">
-        <button type="submit">Add</button>
-    </form>
-    <ul>
-        {% for task in tasks %}
-            <li>
-                {{ task.title }}
-                <a href="{% url 'delete_task' task.id %}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
-</body>
+    <head>
+        <title>To-Do List</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <h1>Welcome to Your To-Do List</h1>
+        <p>Manage your tasks efficiently!</p>
+
+        {% if user.is_authenticated %}
+            <p>Hello, <strong>{{ user.username }}</strong>! <a href="{% url 'logout' %}">Logout</a></p>
+        {% else %}
+            <p><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register here</a></p>
+        {% endif %}
+        <h2>My To-Do List</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="New task">
+            <input type="text" name="description" placeholder="Task description (optional)">
+            <input type="datetime-local" name="due_date" placeholder="Due date (optional)">
+            {% if user.is_authenticated %}
+                <input type="hidden" name="user" value="{{ user.id }}">
+            {% endif %}
+            <button type="submit">Add</button>
+        </form>
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <strong>{{ task.title }}</strong>: {{ task.description }}
+                    <a href="{% url 'delete_task' task.id %}">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </body>
 </html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            const titleInput = form.querySelector('input[name="title"]');
+            if (!titleInput.value.trim()) {
+                alert("Please enter a task title.");
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+

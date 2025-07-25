@@ -1,4 +1,11 @@
-"venv/" 
-"*.pyc" 
-"__pycache__/" 
-"db.sqlite3" 
+
+# VS Code settings
+.vscode/
+.history/
+# Django settings
+*.log
+# Python settings
+.venv/
+*.pyc
+__pycache__/
+db.sqlite3

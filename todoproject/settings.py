@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'todo',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -80,6 +81,10 @@ DATABASES = {
     }
 }
 
+
+LOGIN_URL = '/login/'  # or wherever your login view is
+LOGIN_REDIRECT_URL = '/'  # where to redirect after login
+LOGOUT_REDIRECT_URL = '/login/'  # where to redirect after logout
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
