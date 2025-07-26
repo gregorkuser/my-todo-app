@@ -1,52 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<html>
-    <head>
-        <title>To-Do List</title>
-        <meta charset="UTF-8">
-    </head>
-    <body>
-        <h1>Welcome to Your To-Do List</h1>
-        <p>Manage your tasks efficiently!</p>
 
+{% extends 'todo/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4">To-Do List</h1>
+        <p class="lead">Manage your tasks efficiently!</p>
+    </div>
+    <div class="mb-3 text-end">
         {% if user.is_authenticated %}
-            <p>Hello, <strong>{{ user.username }}</strong>! <a href="{% url 'logout' %}">Logout</a></p>
+            <span class="me-2">Hello, <strong>{{ user.username }}</strong>!</span>
+            <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Logout</a>
         {% else %}
-            <p><a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register here</a></p>
+            <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'login' %}">Login</a>
+            <a class="btn btn-outline-success btn-sm" href="{% url 'register' %}">Register here</a>
         {% endif %}
-        <h2>My To-Do List</h2>
+    </div>
 
-        <form method="POST">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title mb-4">My To-Do List</h3>
+
             {% csrf_token %}
-            <input type="text" name="title" placeholder="New task">
-            <input type="text" name="description" placeholder="Task description (optional)">
-            <input type="datetime-local" name="due_date" placeholder="Due date (optional)">
             {% if user.is_authenticated %}
-                <input type="hidden" name="user" value="{{ user.id }}">
-            {% endif %}
-            <button type="submit">Add</button>
-        </form>
-        <ul>
-            {% for task in tasks %}
-                <li>
-                    <strong>{{ task.title }}</strong>: {{ task.description }}
-                    <a href="{% url 'delete_task' task.id %}">Delete</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </body>
-</html>
+                <p class="text-muted">You can add new tasks below:</p>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(event) {
-            const titleInput = form.querySelector('input[name="title"]');
-            if (!titleInput.value.trim()) {
-                alert("Please enter a task title.");
-                event.preventDefault();
-            }
-        });
-    });
-</script>
+                <form action="{% url 'add_task' %}" method="post">
+                    {% csrf_token %}
+                    {{ form.title.label_tag }} {{ form.title }}
+                    {{ form.description.label_tag }} {{ form.description }}
+                    {{ form.due_date.label_tag }} {{ form.due_date }}
+                    <button type="submit">Add</button>
+                </form>
+
+                {% if tasks %}
+                    <p class="text-muted">You have {{ tasks|length }} tasks:</p>
+                {% else %}
+                    <p class="text-muted">You have no tasks yet.</p>
+                {% endif %}
+
+                <p class="text-muted">Add tasks to your list:</p>
+            {% else %}
+                <p class="text-muted">Please <a href="{% url 'login' %}">login</a> to manage your tasks.</p>
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> Please correct the errors below.
+                </div>
+            {% endif %}
+
+            <ul class="list-group">
+                {% for task in tasks %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ task.title }}</strong>: {{ task.description }}
+                        </div>
+
+                        <a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}">Delete</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div>
+        {% if form.errors %}
+            &lt;div class="error"&gt;
+                {{ form.non_field_errors }}
+            &lt;/div&gt;
+        {% endif %}
+    </div>
+
+    <div>
+        {% if form.title.errors %}
+            &lt;div style="color:red"&gt;{{ form.title.errors }}&lt;/div&gt;
+        {% endif %}
+        {{ form.title.label_tag }} {{ form.title }}
+    </div>
+
+    <div>
+        {% if form.description.errors %}
+            &lt;div style="color:red"&gt;{{ form.description.errors }}&lt;/div&gt;
+        {% endif %}
+
+    {{ form.description.label_tag }} {{ form.description }}
+    </div>
+
+    <div>
+        {% if form.due_date.errors %}
+            &lt;div style="color:red"&gt;{{ form.due_date.errors }}&lt;/div&gt;
+        {% endif %}
+
+        {{ form.due_date.label_tag }} {{ form.due_date }}
+    </div>
+    <button type="submit">Add</button>
+</form>
 

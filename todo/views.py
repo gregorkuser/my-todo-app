@@ -2,6 +2,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Task
+from .forms import TaskForm
+
+from django.contrib import messages  # če želiš prikazati napake tudi v predlogi
+
 
 
 @login_required
@@ -9,13 +13,50 @@ def index(request):
 #    tasks = Task.objects.all()
     tasks = Task.objects.filter(user=request.user)  # Show only user's tasks
     if request.method == "POST":
-        title = request.POST.get("title")
-        description = request.POST.get("description")
-        if title:
-#            Task.objects.create(title=title)
-            Task.objects.create(title=title, description=description, user=request.user)  # Assign task to user
-        return redirect('/')
-    return render(request, 'todo/index.html', {'tasks': tasks})
+        # Handle form submission
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
+            return redirect('index')
+    else:
+        form = TaskForm()
+    return render(request, 'todo/index.html', {'tasks': tasks, 'form': form})
+
+
+@login_required
+def add_task(request):
+    if request.method == "POST":
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            # Save the task with the current user and redirect to the index page
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
+            return redirect('index')
+        else:
+            # Optional: log or print form errors for debugging
+
+            # 🔍 Logiranje napak v konzolo
+            print("Form is not valid:")
+            print(form.errors.as_data())  # struktura napak
+            print(form.errors)            # berljive napake
+
+            # 🔔 Če želiš prikazati napako v predlogi (neobvezno)
+            messages.error(request, "There was an error saving the task.")
+
+
+            tasks = Task.objects.filter(user=request.user)
+            return render(request, 'todo/index.html', {'tasks': tasks, 'form': form})
+    else:
+        # Če nekdo obišče /add/ z GET metodo, ga preusmerimo
+        return redirect('index')
+
+
+
+
+
 
 
 @login_required

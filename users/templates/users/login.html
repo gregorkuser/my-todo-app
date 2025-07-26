@@ -1,7 +1,44 @@
-<h2>Login</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-</form>
-<p>Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+{% extends 'users/base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="login-container shadow p-4 mx-auto" style="max-width: 400px; background-color: #f9f9f9;">
+    <h2 class="text-center mb-4">Login</h2>
+    <form method="post" action="{% url 'login' %}" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" id="username" required />
+            <div class="invalid-feedback">Please enter your username.</div>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+                <input type="password" name="password" class="form-control" id="password" required />
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">Show</button>
+            </div>
+            <div class="invalid-feedback">Please enter your password.</div>
+        </div>
+        {% if form.errors %}
+        <div class="text-danger mb-3">Invalid username or password.</div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+    <p class="mt-3 text-center">
+        Don't have an account? <a href="{% url 'register' %}">Register here</a>
+    </p>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        togglePassword.textContent = type === 'password' ? 'Show' : 'Hide';
+    });
+</script>
+{% endblock %}
