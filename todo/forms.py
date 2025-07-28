@@ -6,29 +6,18 @@ from django.utils.timezone import now
 
 class TaskForm(forms.ModelForm):
     due_date = forms.DateField(
-       # widget=forms.DateInput(format='%d.%m.%Y', attrs={'type': 'date'}),
-       # input_formats=['%d.%m.%Y'],
+        widget = forms.DateInput(attrs = {'type': 'date'}),
+        input_formats = ['%Y-%m-%d', '%d.%m.%Y'],  # dodan ISO format
 
-
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        input_formats=['%Y-%m-%d', '%d.%m.%Y'],  # dodan ISO format
-
-        initial=now()
+        initial = now()
     )
-
-
-# due_date = forms.DateField(
-#    widget=forms.TextInput(attrs={'placeholder': 'dd.mm.yyyy'}),
-#    input_formats=['%d.%m.%Y'],
-#    initial=now()
-# )
-
 
     title = forms.CharField(
-        max_length=200,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Task title'}),
-        required=True
+        max_length = 200,
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Task title'}),
+        required = True
     )
+
     description = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Task description', 'rows': 3}),
         required=False
@@ -36,7 +25,7 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date']
+        fields = ['title', 'description', 'due_date', 'priority']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Task title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Task description', 'rows': 3}),

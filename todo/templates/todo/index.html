@@ -21,6 +21,25 @@
         <div class="card-body">
             <h3 class="card-title mb-4">My To-Do List</h3>
 
+            <form class="mb-4" method="get">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label" for="priority">Filter by Priority:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select" id="priority" name="priority">
+                            <option value="">All</option>
+                            <option value="H">High</option>
+                            <option value="M">Medium</option>
+                            <option value="L">Low</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">Filter</button>
+                    </div>
+                </div>
+            </form>
+
             {% csrf_token %}
             {% if user.is_authenticated %}
                 <p class="text-muted">You can add new tasks below:</p>
@@ -29,7 +48,9 @@
                     {% csrf_token %}
                     {{ form.title.label_tag }} {{ form.title }}
                     {{ form.description.label_tag }} {{ form.description }}
+                    {{ form.priority.label_tag }} {{ form.priority }}
                     {{ form.due_date.label_tag }} {{ form.due_date }}
+
                     <button type="submit">Add</button>
                 </form>
 
@@ -54,7 +75,7 @@
                 {% for task in tasks %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>{{ task.title }}</strong>: {{ task.description }}
+                            <strong>{{ task.title }}</strong>: {{ task.description }} Priority: {{ task.get_priority_display }}
                         </div>
 
                         <a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}">Delete</a>
